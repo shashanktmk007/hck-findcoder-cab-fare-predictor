@@ -1,15 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { ChakraProvider, theme } from "@chakra-ui/react";
+import { BrowserRouter } from "react-router-dom";
+import Footer from "./components/footer";
+import { CssBaseline } from "@mui/material";
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <Router> */}
-    <ChakraProvider theme={theme}>
-      <App />
-    </ChakraProvider>
-    {/* </Router> */}
+    <BrowserRouter>
+      <CssBaseline />
+      <div>
+        <App />
+        <Footer />
+      </div>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
