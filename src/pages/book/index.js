@@ -33,6 +33,7 @@ import { calculatePrice } from "../../utils/price";
 import getVehicleData from "../../services/vehicleInfo";
 import { grey } from "@mui/material/colors";
 import { Link } from "react-router-dom";
+import { SourceDestinationPikcer } from "../../components/SourceDestinationPicker";
 
 export default function Book() {
   // let center = getCurrentLocation()
@@ -195,12 +196,7 @@ export default function Book() {
       </>
     );
   }
-  const options = { closeBoxURL: "", enableEventPropagation: true };
-  const onLoad = (infoBox) => {
-    console.log("infoBox: ", infoBox);
-  };
-  let distanceString = " Distance : " + distance;
-  let durationString = "        Duration " + duration;
+
   let reachBy = new Date();
   console.log(reachBy.getMinutes());
   console.log(reachBy);
@@ -215,80 +211,16 @@ export default function Book() {
   return (
     <>
       {!distance.value && (
-        <div
-          style={{
-            zIndex: "1",
-            position: "absolute",
-            background: "#f4f0f0e0",
-            width: "100vw",
-            paddingLeft: "20px",
-            paddingTop: "20px",
-          }}
-        >
-          <Autocomplete>
-            <>
-              {" "}
-              <input
-                className="input-location sfWidth"
-                label="Source Location"
-                id="sourceLocation"
-                ref={originRef}
-                placeholder="Source Location"
-                value={
-                  sourceLocation.locString === "none"
-                    ? ""
-                    : sourceLocation.locString
-                }
-                // style={{ margin: "30px 0" }}
-              />
-              <span className="searchIcon">
-                <MyLocationOutlinedIcon
-                  sx={{ fontSize: "24px" }}
-                  color="cyan"
-                  onClick={() => {
-                    setDetectingLocation(true);
-                    getCurrentLocation(
-                      process.env.REACT_APP_GOOGLE_MAPS_API_KEY
-                    ).then((locc) => {
-                      setDirectionsResponse(locc);
-                      console.log("locc", locc);
-                      setSourceLocation({
-                        lat: locc.lat,
-                        lng: locc.lng,
-                        locString: locc.newDecodedAddress,
-                      });
-                      setDetectingLocation(false);
-                    });
-                  }}
-                />
-              </span>
-            </>
-          </Autocomplete>
-          {detectingLocation && (
-            <LinearProgress style={{ margin: "30px 0", width: "85vw" }} />
-          )}
-          <div style={{ margin: "30px 0" }}>
-            <Autocomplete>
-              <>
-                <input
-                  className="input-location sfWidth"
-                  label="Destination Location"
-                  id="destinationLocation"
-                  ref={destiantionRef}
-                  placeholder="Destination Location"
-                  // value="Dilsukhnagar, Hyderabad, Telangana, India"
-                  // style={{ margin: "30px 0" }}
-                />
-                <NearMeOutlinedIcon
-                  onClick={calculateRoute}
-                  sx={{ fontSize: "24px" }}
-                  className="searchIcon"
-                />
-              </>
-            </Autocomplete>
-          </div>
-          {/* {renderVechileData()} */}
-        </div>
+        <SourceDestinationPikcer
+          originRef={originRef}
+          sourceLocation={sourceLocation}
+          setDetectingLocation={setDetectingLocation}
+          setDirectionsResponse={setDirectionsResponse}
+          setSourceLocation={setSourceLocation}
+          detectingLocation={detectingLocation}
+          destiantionRef={destiantionRef}
+          calculateRoute={calculateRoute}
+        />
       )}
 
       {distance.value && (
@@ -312,26 +244,6 @@ export default function Book() {
               }}
               onLoad={(map) => setMap(map)}
             >
-              {/* <Marker
-              position={{ lat: sourceLocation.lat, lng: sourceLocation.lng }}
-            /> */}
-              {/* <InfoBox
-              onLoad={onLoad}
-              options={options}
-              position={{ lat: sourceLocation.lat, lng: sourceLocation.lng }}
-            > */}
-              {/* <div
-                style={{
-                  backgroundColor: "yellow",
-                  opacity: 0.75,
-                  padding: 12,
-                }}
-              >
-                <div style={{ fontSize: 16, fontColor: `#08233B` }}>
-                  Hello, World!
-                </div>
-              </div>
-            </InfoBox> */}
               {directionsResponse && (
                 <DirectionsRenderer directions={directionsResponse} />
               )}

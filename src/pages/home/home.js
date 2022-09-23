@@ -39,7 +39,7 @@ let homeTiles = [
     primaryText: "Schedule",
     imageLink:
       "https://static.vecteezy.com/system/resources/previews/006/993/455/non_2x/3d-realistic-blue-clock-illustration-vector.jpg",
-    ctaLink: "",
+    ctaLink: "/schedule",
     ctaText: "",
     xs: "6",
     width: "65%",
