@@ -1,54 +1,24 @@
-import {
-  Button,
-  Grid,
-  LinearProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import "./book.css";
 import {
   useJsApiLoader,
   GoogleMap,
-  Marker,
-  Autocomplete,
   DirectionsRenderer,
-  InfoBox,
 } from "@react-google-maps/api";
 import { useRef, useState } from "react";
-import MyLocationOutlinedIcon from "@mui/icons-material/MyLocationOutlined";
-import NearMeOutlinedIcon from "@mui/icons-material/NearMeOutlined";
-import NavigationOutlinedIcon from "@mui/icons-material/NavigationOutlined";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
-import {
-  Box,
-  ButtonGroup,
-  Flex,
-  HStack,
-  IconButton,
-  SkeletonText,
-  Text,
-} from "@chakra-ui/react";
-import getCurrentLocation from "../../utils/location";
+import { SkeletonText } from "@chakra-ui/react";
 import { calculatePrice } from "../../utils/price";
 import getVehicleData from "../../services/vehicleInfo";
-import { grey } from "@mui/material/colors";
-import { Link } from "react-router-dom";
 import { SourceDestinationPikcer } from "../../components/SourceDestinationPicker";
+import { sendNotification } from "../../utils/notification";
 
 export default function Book() {
-  // let center = getCurrentLocation()
-  //   .then((res) => {
-  //     return res;
-  //   })
-  //   .catch((err) => {
-  //     return err;
-  //   });
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     // googleMapsApiKey: "process.env.REACT_APP_GOOGLE_MAPS_API_KEY",
     libraries: ["places"],
   });
-  let center = { lat: 48.8584, lng: 2.2945 };
 
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const [directionsResponse, setDirectionsResponse] = useState(null);
@@ -67,6 +37,12 @@ export default function Book() {
   /** @type React.MutableRefObject<HTMLInputElement> */
   const destiantionRef = useRef();
 
+  let reachBy = new Date();
+  reachBy.setMinutes(reachBy.getMinutes() + duration.value / 60);
+  let reachByMins =
+    reachBy.getMinutes() <= 9
+      ? "0" + reachBy.getMinutes()
+      : reachBy.getMinutes();
   if (!isLoaded) {
     return <SkeletonText />;
   }
@@ -75,8 +51,6 @@ export default function Book() {
     if (originRef.current.value === "" || destiantionRef.current.value === "") {
       return;
     }
-    console.log(originRef.current.value);
-    console.log(destiantionRef.current.value);
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
     setDestinationPlace(destiantionRef.current.value);
@@ -95,6 +69,7 @@ export default function Book() {
       text: results.routes[0].legs[0].duration.text,
       value: results.routes[0].legs[0].duration.value,
     });
+    // sendNotification("", "", origin);
   };
 
   function clearRoute() {
@@ -103,6 +78,11 @@ export default function Book() {
     setDuration("");
     originRef.current.value = "";
     destiantionRef.current.value = "";
+  }
+  function bookRide(originalPrice, name, destinationPlace, time) {
+    let message = `Thank for booking a ${name} to ${destinationPlace} for Rs.${originalPrice}. You will reach by ${time}.`;
+    sendNotification(message, "", "");
+    setTimeout(() => sendNotification("", "", destinationPlace), 5000);
   }
   function renderVechileData() {
     let hasPriceSurge = false;
@@ -116,7 +96,6 @@ export default function Book() {
     ) {
       hasPriceSurge = true;
       priceSurge = 1.25;
-      console.log("destiantionRef.current.value", hasPriceSurge);
     } else {
     }
     if (!duration) {
@@ -124,7 +103,6 @@ export default function Book() {
     }
     let arr = [];
     Object.entries(getVehicleData()).forEach(([key, value]) => {
-      console.log(distance, duration, hasPriceSurge, priceSurge, value);
       let formattedDistance = Math.round(distance.value / 1000);
       formattedDistance = !formattedDistance ? 2 : formattedDistance;
       //TODO: handle distance too small if time permits
@@ -137,27 +115,17 @@ export default function Book() {
           priceSurge,
           value.pricePerKm
         ),
-        // price: calculatePrice(
-        //   Math.round(22940 / 1000),
-        //   9600 / 60,
-        //   hasPriceSurge,
-        //   priceSurge,
-        //   value.pricePerKm
-        // ),
         image: value.image,
         name: value.name,
         description: value.description,
         hasPriceSurge: hasPriceSurge,
       });
     });
-    console.log(arr);
-    arr.forEach((e) => console.log(e));
     return (
       <>
         <Grid container spacing={2} style={{ marginTop: "2px" }}>
           {arr.map((entry) => {
             let originalPrice = +entry.price.split("₹ ")[1];
-            // alert(entry.price.split("₹ "));
             let discountPrice = originalPrice - 0.15 * originalPrice;
             return (
               <>
@@ -174,7 +142,18 @@ export default function Book() {
                   <Typography>{entry.description}</Typography>
                 </Grid>
                 <Grid item xs={1} />
-                <Grid item xs={3}>
+                <Grid
+                  item
+                  xs={3}
+                  onClick={() => {
+                    bookRide(
+                      originalPrice,
+                      entry.name,
+                      destinationPlace,
+                      reachBy.getHours() + " : " + reachByMins
+                    );
+                  }}
+                >
                   <Typography style={{ alignContent: "right" }} variant="h6">
                     {entry.price}
                   </Typography>
@@ -197,17 +176,6 @@ export default function Book() {
     );
   }
 
-  let reachBy = new Date();
-  console.log(reachBy.getMinutes());
-  console.log(reachBy);
-
-  reachBy.setMinutes(reachBy.getMinutes() + duration.value / 60);
-  console.log(reachBy);
-  console.log(reachBy);
-  let reachByMins =
-    reachBy.getMinutes() <= 9
-      ? "0" + reachBy.getMinutes()
-      : reachBy.getMinutes();
   return (
     <>
       {!distance.value && (

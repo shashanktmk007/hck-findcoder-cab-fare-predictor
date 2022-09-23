@@ -23,10 +23,18 @@ export default function Footer() {
         <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
         {/* </Link> */}
         {/* <Link to="/Home"> */}
-        <BottomNavigationAction label="Home" icon={<FavoriteIcon />} />
+        <BottomNavigationAction
+          label="Home"
+          icon={<FavoriteIcon />}
+          href="/home"
+        />
         {/* </Link> */}
         {/* <Link to="/account"> */}
-        <BottomNavigationAction label="Account" icon={<LocationOnIcon />} />
+        <BottomNavigationAction
+          label="Account"
+          href="/account"
+          icon={<LocationOnIcon />}
+        />
         {/* </Link> */}
       </BottomNavigation>
     </>

@@ -10,16 +10,6 @@ export function calculatePrice(
   let basePrice =
     distance * pricePerKM * durationCoefficient * timeOfDayCoefficient;
   let price = hasPriceSurge ? basePrice * priceSurge : basePrice;
-  console.log(
-    distance,
-    duration,
-    hasPriceSurge,
-    priceSurge,
-    pricePerKM,
-    durationCoefficient,
-    timeOfDayCoefficient
-  );
-
   // send this to some magic AI to predict right price as per the customer behaviour
   return "₹ " + Math.round(price, 2);
 }

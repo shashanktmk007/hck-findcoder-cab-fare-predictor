@@ -6,7 +6,6 @@ export default function getCurrentLocation(key) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            console.log(position);
             location = {
               lat: position.coords.latitude,
               lng: position.coords.longitude,
@@ -18,10 +17,8 @@ export default function getCurrentLocation(key) {
               .geocode({ location: { lat: location.lat, lng: location.lng } })
               .then((response) => {
                 if (response.results[0]) {
-                  console.log("latlng ", response.results[0].formatted_address);
                   location.newDecodedAddress =
                     response.results[0].formatted_address;
-                  console.log("resolve(location) - 2", location);
 
                   resolve(location);
                 } else {
@@ -29,8 +26,6 @@ export default function getCurrentLocation(key) {
                 }
               })
               .catch((e) => window.alert("Geocoder failed due to: " + e));
-
-            console.log("resolve(location)", location);
           },
           (error) => {
             //Handle Errors

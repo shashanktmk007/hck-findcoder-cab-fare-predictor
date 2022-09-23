@@ -19,14 +19,12 @@ export default function VechileDetails(
   ) {
     hasPriceSurge = true;
     priceSurge = 1.25;
-    console.log("destiantionRef.current.value", hasPriceSurge);
   }
   if (!duration) {
     return;
   }
   let arr = [];
   Object.entries(getVehicleData()).forEach(([key, value]) => {
-    console.log(distance, duration, hasPriceSurge, priceSurge, value);
     let formattedDistance = Math.round(distance.value / 1000);
     formattedDistance = !formattedDistance ? 2 : formattedDistance;
     //TODO: handle distance too small if time permits
